@@ -1,10 +1,23 @@
 const express = require("express");
 const app = express();
+require("dotenv").config();
+
+// Middleware converts req.body to json format
+app.use(express.json());
 
 app.get("/", (req, res) => {
-  res.send("Testing ...");
+  const product = {
+    id: 1,
+    name: "Intel CPU",
+    price: 200,
+  };
+  res.json(product);
 });
 
-app.listen(3000, () => {
-  console.log("Running on port 3000...");
+app.post("/", (req, res) => {
+  res.json(req.body);
+});
+
+app.listen(process.env.PORT, () => {
+  console.log(`Running on port ${process.env.PORT}`);
 });
