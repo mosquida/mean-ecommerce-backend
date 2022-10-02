@@ -1,9 +1,11 @@
 const express = require("express");
 const app = express();
+const morgan = require("morgan");
 require("dotenv").config();
 
-// Middleware converts req.body to json format
-app.use(express.json());
+// Middlewares
+app.use(express.json()); // JSON parser
+app.use(morgan("tiny")); // HTTP logger
 
 app.get("/", (req, res) => {
   const product = {
