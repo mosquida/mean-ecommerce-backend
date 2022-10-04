@@ -12,7 +12,7 @@ app.use(express.json()); // JSON parser
 app.use(morgan("tiny")); // HTTP logger
 
 // Routes
-app.use("/api/v1/product", require("./routes/product"));
+app.use("/api/v1/products", require("./routes/product"));
 
 // Database Connection
 mongoose
