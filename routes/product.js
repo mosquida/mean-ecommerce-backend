@@ -114,7 +114,7 @@ router.delete("/:id", async (req, res) => {
 // Returns number of products
 router.get("/get/count", async (req, res) => {
   try {
-    const featuredProducts = await Product.countDocuments();
+    const productCount = await Product.countDocuments();
     if (!productCount)
       return res.status(404).json({ message: "No products found" });
 
