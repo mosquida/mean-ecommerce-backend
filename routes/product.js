@@ -102,4 +102,35 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Returns number of products
+router.get("/get/count", async (req, res) => {
+  try {
+    const featuredProducts = await Product.countDocuments();
+    if (!productCount)
+      return res.status(404).json({ message: "No products found" });
+
+    return res.json({ productCount });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+// Returns list of featured products with optional limit
+router.get("/get/featured/:count?", async (req, res) => {
+  try {
+    const count = req.params.count ? req.params.count : 0;
+    // .find() filter = returns data from specified field to match criteria
+    const featuredProducts = await Product.find({ isFeatured: true }).limit(
+      parseInt(count)
+    );
+
+    if (!featuredProducts)
+      return res.status(404).json({ message: "No products found" });
+
+    return res.json(featuredProducts);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
