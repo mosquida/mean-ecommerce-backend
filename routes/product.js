@@ -4,7 +4,16 @@ const Category = require("../models/category");
 
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find();
+    // /api/v1/products?queryParameter=value
+    // /api/v1/products?category=id1,id2   = multiple values
+    let filter = {};
+    if (req.query.category) {
+      // split the query parameter value string into array
+      filter = { category: req.query.category.split(",") };
+    }
+
+    // Fetch products by optional category query filter
+    const products = await Product.find(filter).populate("category");
 
     if (!products)
       return res.status(404).json({ message: "No products found" });
