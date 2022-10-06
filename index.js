@@ -13,7 +13,8 @@ app.use(morgan("tiny")); // HTTP logger
 
 // Routes
 app.use("/api/v1/products", require("./routes/product"));
-app.use("/api/v1/category", require("./routes/category"));
+app.use("/api/v1/categories", require("./routes/category"));
+app.use("/api/v1/users", require("./routes/user"));
 
 // Database Connection
 mongoose
