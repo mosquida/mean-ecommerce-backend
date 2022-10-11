@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 
 const userSchema = mongoose.Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phone: { type: String, default: "" },
   apartment: { type: String, default: "" },
@@ -37,12 +37,8 @@ userSchema.pre("save", function (next) {
 });
 
 // Compare user password against hashed password
-userSchema.methods.comparePassword = function (candidatePassword, cb) {
-  bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    if (err) return cb(err);
-
-    cb(null, isMatch);
-  });
+userSchema.methods.comparePassword = function (candidatePassword) {
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 module.exports = mongoose.model("User", userSchema);

@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 router.get("/", async (req, res) => {
   try {
@@ -50,6 +51,31 @@ router.post("/", async (req, res) => {
     return res.status(200).json(user);
   } catch (err) {
     return res.status(500).json(err);
+  }
+});
+
+router.post("/login", async (req, res) => {
+  // Check if user user exist
+  const user = await User.findOne({
+    email: req.body.email,
+  });
+
+  if (!user) return res.status(404).json({ message: "No user found" });
+
+  // Verify Password
+  if (user && (await user.comparePassword(req.body.password))) {
+    //Create JWT Token
+    const token = jwt.sign(
+      {
+        userId: user._id,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "1day" }
+    );
+
+    return res.json({ email: user.email, token: token });
+  } else {
+    return res.json({ message: "Invalid Password " });
   }
 });
 
