@@ -11,6 +11,12 @@ app.use(cors());
 app.use(express.json()); // JSON parser
 app.use(morgan("tiny")); // HTTP logger
 app.use(auth()); // JWT Auth Route Middleware
+// Handling Middleware Error, Beutifies Return Message
+app.use((err, req, res, next) => {
+  if (err) return res.json(err);
+
+  next();
+});
 
 // Routes
 app.use("/api/v1/products", require("./routes/product"));
