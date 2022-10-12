@@ -3,13 +3,14 @@ const app = express();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
-
+const auth = require("./utils/auth");
 require("dotenv").config();
 
 // Middlewares
 app.use(cors());
 app.use(express.json()); // JSON parser
 app.use(morgan("tiny")); // HTTP logger
+app.use(auth()); // JWT Auth Route Middleware
 
 // Routes
 app.use("/api/v1/products", require("./routes/product"));
