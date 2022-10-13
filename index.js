@@ -14,7 +14,6 @@ app.use(auth()); // JWT Auth Route Middleware
 // Handling Middleware Error, Beutifies Return Message
 app.use((err, req, res, next) => {
   if (err) return res.json(err);
-
   next();
 });
 
