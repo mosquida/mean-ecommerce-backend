@@ -114,4 +114,17 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+router.get("/get/count", async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+
+    if (!userCount)
+      return res.status(404).json({ message: "No userCount found" });
+
+    return res.json({ userCount: userCount });
+  } catch (error) {
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
