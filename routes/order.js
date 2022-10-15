@@ -24,6 +24,8 @@ router.get("/:id", async (req, res) => {
     //.populate("user", ["name", "email"] = populate and return only selected fields
     // .populate({ path: "orderItems", populate: "product" }) (path: field to populate) (populate: sub populate the result)
     //     population sequence : order => orderItems => products
+    // when need to 3 populate
+    //     .populate({ path: "orderItems", populate: {path: "produc:"", populate: "category"} })
     // .sort("dateOrdered") = sort old to new by default,
     // .sort({"dateOrdered": -1}); = sort new to old
     const order = await Order.findById(req.params.id)
@@ -54,7 +56,6 @@ router.post("/", async (req, res) => {
         });
 
         newOrderItem = await newOrderItem.save();
-        console.log(typeof newOrderItem._id);
         // Return only id to be save on array
         return newOrderItem._id;
       })
@@ -78,6 +79,40 @@ router.post("/", async (req, res) => {
     order = await order.save();
 
     if (!order) return res.status(404).json({ message: "No order created" });
+
+    return res.json(order);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+// Used to change deliveryStatus from pending to something
+router.put("/:id", async (req, res) => {
+  try {
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      { shippingStatus: req.body.shippingStatus },
+      { new: true }
+    );
+
+    if (!order) return res.status(404).json({ message: "No order modified" });
+
+    return res.json(order);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    // Delete Order
+    const order = await Order.findByIdAndRemove(req.params.id);
+    // Delete Order.OrderItems
+    order.orderItems.map(async (item) => {
+      await OrderItem.findByIdAndRemove(item);
+    });
+
+    if (!order) return res.status(404).json({ message: "No order deleted" });
 
     return res.json(order);
   } catch (err) {
