@@ -4,11 +4,35 @@ const OrderItem = require("../models/order-item");
 
 router.get("/", async (req, res) => {
   try {
-    const orders = await Order.find();
+    //.populate("user", ["name", "email"] = populate and return only selected fields
+    // .sort("dateOrdered") = sort old to new by default,
+    // .sort({"dateOrdered": -1}); = sort new to old
+    const orders = await Order.find()
+      .populate("user", ["name", "email"])
+      .sort({ dateOrdered: -1 });
 
     if (!orders) return res.status(404).json({ message: "No orders found" });
 
     return res.json(orders);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    //.populate("user", ["name", "email"] = populate and return only selected fields
+    // .populate({ path: "orderItems", populate: "product" }) (path: field to populate) (populate: sub populate the result)
+    //     population sequence : order => orderItems => products
+    // .sort("dateOrdered") = sort old to new by default,
+    // .sort({"dateOrdered": -1}); = sort new to old
+    const order = await Order.findById(req.params.id)
+      .populate({ path: "orderItems", populate: "product" })
+      .populate("user", ["name", "email"]);
+
+    if (!order) return res.status(404).json({ message: "No order found" });
+
+    return res.json(order);
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -38,7 +62,7 @@ router.post("/", async (req, res) => {
 
     // Resolves the promise above by waiting
     const orderItemsResolved = await orderItems;
-    console.log(orderItemsResolved);
+
     let order = new Order({
       orderItems: orderItemsResolved,
       shippingAddress: req.body.shippingAddress,
