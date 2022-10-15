@@ -21,6 +21,7 @@ app.use((err, req, res, next) => {
 app.use("/api/v1/products", require("./routes/product"));
 app.use("/api/v1/categories", require("./routes/category"));
 app.use("/api/v1/users", require("./routes/user"));
+app.use("/api/v1/orders", require("./routes/order"));
 
 // Database Connection
 mongoose
