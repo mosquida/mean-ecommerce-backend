@@ -64,6 +64,21 @@ router.post("/", async (req, res) => {
     // Resolves the promise above by waiting
     const orderItemsResolved = await orderItems;
 
+    let totalPrice = 0;
+
+    // Wait to resolved
+    totalOrder = await Promise.all(
+      orderItemsResolved.map(async (item) => {
+        const orderItem = await OrderItem.findById(item).populate("product", [
+          "price",
+        ]);
+
+        const orderPrice = orderItem.product.price * orderItem.quantity;
+
+        totalPrice += orderPrice;
+      })
+    );
+
     let order = new Order({
       orderItems: orderItemsResolved,
       shippingAddress: req.body.shippingAddress,
@@ -72,7 +87,7 @@ router.post("/", async (req, res) => {
       country: req.body.country,
       phone: req.body.phone,
       shippingStatus: req.body.status,
-      totalPrice: req.body.totalPrice,
+      totalPrice: totalPrice,
       user: req.body.user,
     });
 
