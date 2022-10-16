@@ -66,6 +66,7 @@ router.post("/", async (req, res) => {
 
     let totalPrice = 0;
 
+    // Calculate Total Price
     // Wait to resolved
     totalOrder = await Promise.all(
       orderItemsResolved.map(async (item) => {
@@ -130,6 +131,23 @@ router.delete("/:id", async (req, res) => {
     if (!order) return res.status(404).json({ message: "No order deleted" });
 
     return res.json(order);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
+router.get("/get/totalsales", async (req, res) => {
+  try {
+    // aggregate = process data by passing to stages
+    // { $group: { _id: null} => group by id
+    const totalSales = await Order.aggregate([
+      { $group: { _id: null, total: { $sum: "$totalPrice" } } },
+    ]);
+
+    if (!totalSales)
+      return res.status(404).json({ message: "No totalSales generated" });
+
+    return res.json({ totalSales: totalSales[0].total });
   } catch (err) {
     return res.status(500).json(err);
   }
