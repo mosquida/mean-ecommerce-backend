@@ -153,4 +153,23 @@ router.get("/get/totalsales", async (req, res) => {
   }
 });
 
+router.get("/get/userorders/:id", async (req, res) => {
+  try {
+    const orders = await Order.find({ user: req.params.id }).populate({
+      path: "orderItems",
+      populate: {
+        path: "product",
+        populate: "category",
+      },
+    });
+
+    if (!orders)
+      return res.status(404).json({ message: "No orders generated" });
+
+    return res.json(orders);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+});
+
 module.exports = router;
