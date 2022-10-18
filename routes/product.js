@@ -181,4 +181,41 @@ router.get("/get/featured/:count?", async (req, res) => {
   }
 });
 
+router.put(
+  "/gallery/:id",
+  uploadOptions.array("images", 10),
+  async (req, res) => {
+    try {
+      let imagePaths = [];
+
+      // files for uploadng array
+      if (req.files) {
+        // loop through and generate path
+        req.files.map((file) => {
+          imagePaths.push(
+            `${req.protocol}://${req.get("host")}/public/uploads/${
+              file.filename
+            }`
+          );
+        });
+      }
+
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          images: imagePaths,
+        },
+        { new: true }
+      );
+
+      if (!product)
+        return res.status(500).json({ message: "Product not updated" });
+
+      return res.status(200).json(product);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  }
+);
+
 module.exports = router;
