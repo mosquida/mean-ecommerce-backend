@@ -74,6 +74,10 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).json({ message: "Invalid category" });
 
+    // If no imgae wa upload on frontend
+    const file = req.file;
+    if (!file) return res.status(400).json({ message: "No image uploaded" });
+
     // prettier-ignore
     // Full URL path of image
     const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}}`;
