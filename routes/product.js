@@ -1,21 +1,35 @@
 const router = require("express").Router();
 const multer = require("multer");
+const path = require("path");
 const Product = require("../models/product");
 const Category = require("../models/category");
 
-// FIle Upload Configuration with unique file naming
+const ACCEPTED_FILES = {
+  "image/png": "png",
+  "image/jpeg": "jpeg",
+  "image/jpg": "jpg",
+};
+
+// File Upload Configuration with unique file naming control
 // https://www.npmjs.com/package/multer#diskstorage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "/public/uploads");
+    cb(null, path.join(__dirname, "../public/uploads/"));
   },
   filename: function (req, file, cb) {
+    // Returns extension
+    const extension = ACCEPTED_FILES[file.mimetype];
+
+    //cb(null) if extensions is not undefined
+    let uploadErr = new Error("Invalid/unaccepted file type");
+    if (extension) uploadErr = null;
+
     const uniqueSuffix = Date.now() + Math.round(Math.random() * 1e9);
-    cb(null, file.fieldname.split(" ").join("_") + "_" + uniqueSuffix);
+    cb(uploadErr, file.fieldname + "_" + uniqueSuffix + `.${extension}`);
   },
 });
 
-// use disk storage engine config
+// USE disk storage engine config defined above
 const uploadOptions = multer({ storage: storage });
 
 router.get("/", async (req, res) => {
@@ -60,7 +74,9 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
     const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).json({ message: "Invalid category" });
 
-    const filename = req.file.filename;
+    // prettier-ignore
+    // Full URL path of image
+    const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}}`;
 
     let product = new Product({
       name: req.body.name,
