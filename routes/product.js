@@ -106,18 +106,30 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", uploadOptions.single("image"), async (req, res) => {
   try {
     const category = await Category.findById(req.body.category);
     if (!category) return res.status(400).json({ message: "Invalid category" });
 
-    const product = await Product.findByIdAndUpdate(
+    //  Make sure there is one to update
+    let product = await product.findById(req.params.id);
+    if (!product) return res.status(400).json({ message: "Invalid product" });
+
+    // Check if empty(no update) or not(update)
+    const filename = product.image;
+    if (req.file) {
+      filename = `${req.protocol}://${req.get("host")}/public/uploads/${
+        req.file.filename
+      }}`;
+    }
+
+    product = await Product.findByIdAndUpdate(
       req.params.id,
       {
         name: req.body.name,
         description: req.body.description,
         richDescription: req.body.richDescription,
-        image: req.body.image,
+        image: filename,
         brand: req.body.brand,
         price: req.body.price,
         category: req.body.category,
