@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const auth = require("./utils/auth");
+const path = require("path");
 require("dotenv").config();
 
 // Middlewares
@@ -11,6 +12,10 @@ app.use(cors());
 app.use(express.json()); // JSON parser
 app.use(morgan("tiny")); // HTTP logger
 app.use(auth()); // JWT Auth Route Middleware
+app.use(
+  "/public/uploads",
+  express.static(path.join(__dirname, "/public/uploads"))
+);
 // Handling Middleware Error, Beutifies Return Message
 app.use((err, req, res, next) => {
   if (err) return res.json(err);

@@ -13,6 +13,7 @@ module.exports = function () {
       "/api/v1/users/register",
       { url: /^\/api\/v1\/products\/.*/, methods: ["GET"] },
       { url: /^\/api\/v1\/categories\/.*/, methods: ["GET"] },
+      { url: /^\/public\/uploads\/.*/, methods: ["GET"] },
     ],
   });
   // Exlude routes to jwt auth middleware using .unless()

@@ -80,7 +80,7 @@ router.post("/", uploadOptions.single("image"), async (req, res) => {
 
     // prettier-ignore
     // Full URL path of image
-    const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}}`;
+    const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}`;
 
     let product = new Product({
       name: req.body.name,
