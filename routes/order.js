@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const Order = require("../models/order");
 const OrderItem = require("../models/order-item");
+const auth = require("../utils/auth");
+const admin = require("../utils/admin");
 
-router.get("/", async (req, res) => {
+router.get("/", [auth], async (req, res) => {
   try {
     //.populate("user", ["name", "email"] = populate and return only selected fields
     // .sort("dateOrdered") = sort old to new by default,
@@ -19,7 +21,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", [auth], async (req, res) => {
   try {
     //.populate("user", ["name", "email"] = populate and return only selected fields
     // .populate({ path: "orderItems", populate: "product" }) (path: field to populate) (populate: sub populate the result)
@@ -40,7 +42,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", [auth], async (req, res) => {
   try {
     //  Create each OrderItems first with map() loop,
     //  then set as value on Order.orderItems
@@ -103,7 +105,7 @@ router.post("/", async (req, res) => {
 });
 
 // Used to change deliveryStatus from pending to something
-router.put("/:id", async (req, res) => {
+router.put("/:id", [auth], async (req, res) => {
   try {
     const order = await Order.findByIdAndUpdate(
       req.params.id,
@@ -119,7 +121,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth], async (req, res) => {
   try {
     // Delete Order
     const order = await Order.findByIdAndRemove(req.params.id);

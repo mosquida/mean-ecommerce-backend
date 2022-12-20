@@ -2,8 +2,10 @@ const router = require("express").Router();
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const auth = require("../utils/auth");
+const admin = require("../utils/admin");
 
-router.get("/", async (req, res) => {
+router.get("/", [auth, admin], async (req, res) => {
   try {
     const users = await User.find().select("-password"); //excludes passwords using "-"
 
@@ -15,7 +17,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", [auth], async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
 
@@ -79,7 +81,7 @@ router.post("/login", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", [auth], async (req, res) => {
   try {
     // Update User without required Password field
     const userExists = await User.findById(req.params.id);

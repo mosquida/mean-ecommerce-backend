@@ -3,6 +3,8 @@ const multer = require("multer");
 const path = require("path");
 const Product = require("../models/product");
 const Category = require("../models/category");
+const auth = require("../utils/auth");
+const admin = require("../utils/admin");
 
 const ACCEPTED_FILES = {
   "image/png": "png",
@@ -68,64 +70,26 @@ router.get("/:id", async (req, res) => {
 });
 
 // uploadOptions.single('image') = uploads req.body.image
-router.post("/", uploadOptions.single("image"), async (req, res) => {
-  try {
-    // Verify if category id exist
-    const category = await Category.findById(req.body.category);
-    if (!category) return res.status(400).json({ message: "Invalid category" });
+router.post(
+  "/",
+  [auth, admin],
+  uploadOptions.single("image"),
+  async (req, res) => {
+    try {
+      // Verify if category id exist
+      const category = await Category.findById(req.body.category);
+      if (!category)
+        return res.status(400).json({ message: "Invalid category" });
 
-    // If no imgae wa upload on frontend
-    const file = req.file;
-    if (!file) return res.status(400).json({ message: "No image uploaded" });
+      // If no imgae wa upload on frontend
+      const file = req.file;
+      if (!file) return res.status(400).json({ message: "No image uploaded" });
 
-    // prettier-ignore
-    // Full URL path of image
-    const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}`;
+      // prettier-ignore
+      // Full URL path of image
+      const filename = `${req.protocol}://${req.get("host")}/public/uploads/${req.file.filename}`;
 
-    let product = new Product({
-      name: req.body.name,
-      description: req.body.description,
-      richDescription: req.body.richDescription,
-      image: filename,
-      brand: req.body.brand,
-      price: req.body.price,
-      category: req.body.category,
-      stock: req.body.stock,
-      rating: req.body.rating,
-      isFeatured: req.body.isFeatured,
-    });
-
-    product = await product.save();
-
-    if (!product)
-      return res.status(500).json({ message: "Error saving product" });
-
-    return res.json(product);
-  } catch (err) {
-    return res.status(500).json(err);
-  }
-});
-
-router.put("/:id", uploadOptions.single("image"), async (req, res) => {
-  try {
-    const category = await Category.findById(req.body.category);
-    if (!category) return res.status(400).json({ message: "Invalid category" });
-
-    //  Make sure there is one to update
-    let product = await product.findById(req.params.id);
-    if (!product) return res.status(400).json({ message: "Invalid product" });
-
-    // Check if empty(no update) or not(update)
-    const filename = product.image;
-    if (req.file) {
-      filename = `${req.protocol}://${req.get("host")}/public/uploads/${
-        req.file.filename
-      }}`;
-    }
-
-    product = await Product.findByIdAndUpdate(
-      req.params.id,
-      {
+      let product = new Product({
         name: req.body.name,
         description: req.body.description,
         richDescription: req.body.richDescription,
@@ -136,20 +100,70 @@ router.put("/:id", uploadOptions.single("image"), async (req, res) => {
         stock: req.body.stock,
         rating: req.body.rating,
         isFeatured: req.body.isFeatured,
-      },
-      { new: true }
-    );
+      });
 
-    if (!product)
-      return res.status(500).json({ message: "Product not updated" });
+      product = await product.save();
 
-    return res.status(200).json(product);
-  } catch (err) {
-    return res.status(500).json(err);
+      if (!product)
+        return res.status(500).json({ message: "Error saving product" });
+
+      return res.json(product);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
   }
-});
+);
 
-router.delete("/:id", async (req, res) => {
+router.put(
+  "/:id",
+  [auth, admin],
+  uploadOptions.single("image"),
+  async (req, res) => {
+    try {
+      const category = await Category.findById(req.body.category);
+      if (!category)
+        return res.status(400).json({ message: "Invalid category" });
+
+      //  Make sure there is one to update
+      let product = await product.findById(req.params.id);
+      if (!product) return res.status(400).json({ message: "Invalid product" });
+
+      // Check if empty(no update) or not(update)
+      const filename = product.image;
+      if (req.file) {
+        filename = `${req.protocol}://${req.get("host")}/public/uploads/${
+          req.file.filename
+        }}`;
+      }
+
+      product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
+          description: req.body.description,
+          richDescription: req.body.richDescription,
+          image: filename,
+          brand: req.body.brand,
+          price: req.body.price,
+          category: req.body.category,
+          stock: req.body.stock,
+          rating: req.body.rating,
+          isFeatured: req.body.isFeatured,
+        },
+        { new: true }
+      );
+
+      if (!product)
+        return res.status(500).json({ message: "Product not updated" });
+
+      return res.status(200).json(product);
+    } catch (err) {
+      return res.status(500).json(err);
+    }
+  }
+);
+
+router.delete("/:id", [auth, admin], async (req, res) => {
   try {
     const product = await Product.findByIdAndRemove(req.params.id);
 
@@ -195,6 +209,7 @@ router.get("/get/featured/:count?", async (req, res) => {
 
 router.put(
   "/gallery/:id",
+  [auth, admin],
   uploadOptions.array("images", 10),
   async (req, res) => {
     try {

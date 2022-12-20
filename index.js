@@ -3,7 +3,6 @@ const app = express();
 const morgan = require("morgan");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const auth = require("./utils/auth");
 const path = require("path");
 require("dotenv").config();
 
@@ -11,7 +10,6 @@ require("dotenv").config();
 app.use(cors());
 app.use(express.json()); // JSON parser
 app.use(morgan("tiny")); // HTTP logger
-app.use(auth()); // JWT Auth Route Middleware
 app.use(
   "/public/uploads",
   express.static(path.join(__dirname, "/public/uploads"))

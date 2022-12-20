@@ -1,5 +1,7 @@
 const router = require("express").Router();
 const Category = require("../models/category");
+const auth = require("../utils/auth");
+const admin = require("../utils/admin");
 
 router.get("/", async (req, res) => {
   try {
@@ -27,7 +29,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", [auth, admin], async (req, res) => {
   try {
     let category = new Category({
       name: req.body.name,
@@ -46,7 +48,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", [auth, admin], async (req, res) => {
   try {
     const category = await Category.findByIdAndUpdate(
       req.params.id,
@@ -68,7 +70,7 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", [auth, admin], async (req, res) => {
   try {
     const category = await Category.findByIdAndRemove(req.params.id);
 

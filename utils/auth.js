@@ -1,35 +1,17 @@
-var { expressjwt: jwt } = require("express-jwt");
+const jwt = require("jsonwebtoken");
 
-// prettier-ignore
-module.exports = function () {
-  // isRevoked = revoking the token when condition met
-  return jwt({
-    secret: process.env.JWT_SECRET_KEY,
-    algorithms: ["HS256"],
-    isRevoked: revokeCondition
-  }).unless({
-    path: [
-      "/api/v1/users/login",
-      "/api/v1/users/register",
-      { url: /^\/api\/v1\/products\/.*/, methods: ["GET"] },
-      { url: /^\/api\/v1\/categories\/.*/, methods: ["GET"] },
-      { url: /^\/public\/uploads\/.*/, methods: ["GET"] },
-    ],
-  });
-  // Exlude routes to jwt auth middleware using .unless()
-  // Regex can be used in url path
+function auth(req, res, next) {
+  const token = req.header("Authorization");
 
-  //"/\api/\v1/\products(.*)" = all subroutes of products, ex products/1
-};
+  if (!token) return res.status(401).json({ message: "No token provided" });
 
-// payload = jwt token data
-// done = similar to next()
-async function revokeCondition(req, payload) {
-  // IF user is not admin = customer
-  if (!payload.payload.isAdmin) {
-    // Reject the payload
-    return true; // revoke the token
+  try {
+    const user = jwt.verify(token, process.env.JWT_SECRET_KEY);
+    req.user = user;
+    next();
+  } catch (e) {
+    return res.status(500).json(e);
   }
-  // if user is admin
-  return false; // continue to route
 }
+
+module.exports = auth;
