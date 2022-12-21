@@ -10,7 +10,7 @@ router.get("/", async (req, res) => {
     if (!categories)
       return res.status(404).json({ message: "No categories found" });
 
-    return res.json(categories);
+    return res.status(200).json(categories);
   } catch (err) {
     return res.status(500).json(err);
   }
