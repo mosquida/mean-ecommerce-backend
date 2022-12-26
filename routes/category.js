@@ -72,7 +72,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
 router.delete("/:id", [auth, admin], async (req, res) => {
   try {
-    const category = await Category.findByIdAndRemove(req.params.id);
+    const category = await Category.findOneAndDelete({ id: req.params.id });
 
     if (!category)
       return res.status(404).json({ message: "No category deleted" });
