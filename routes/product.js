@@ -133,7 +133,7 @@ router.put(
       if (req.file) {
         filename = `${req.protocol}://${req.get("host")}/public/uploads/${
           req.file.filename
-        }}`;
+        }`;
       }
 
       product = await Product.findByIdAndUpdate(
