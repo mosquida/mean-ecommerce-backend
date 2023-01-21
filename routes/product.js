@@ -125,7 +125,7 @@ router.put(
         return res.status(400).json({ message: "Invalid category" });
 
       //  Make sure there is one to update
-      let product = await product.findById(req.params.id);
+      let product = await Product.findById(req.params.id);
       if (!product) return res.status(400).json({ message: "Invalid product" });
 
       // Check if empty(no update) or not(update)

@@ -55,7 +55,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
       {
         name: req.body.name,
         color: req.body.color,
-        icon: req.body.icon,
       },
       { new: true }
     );
