@@ -37,10 +37,7 @@ router.post("/", async (req, res) => {
       email: req.body.email,
       password: req.body.password,
       phone: req.body.phone,
-      apartment: req.body.apartment,
-      street: req.body.street,
-      city: req.body.city,
-      zipcode: req.body.zipcode,
+      address: req.body.address,
       country: req.body.country,
       isAdmin: req.body.isAdmin,
     });
@@ -97,10 +94,7 @@ router.put("/:id", [auth], async (req, res) => {
         email: req.body.email,
         password: newPass,
         phone: req.body.phone,
-        apartment: req.body.apartment,
-        street: req.body.street,
-        city: req.body.city,
-        zipcode: req.body.zipcode,
+        address: req.body.address,
         country: req.body.country,
         isAdmin: req.body.isAdmin,
       },
@@ -125,6 +119,18 @@ router.get("/get/count", async (req, res) => {
 
     return res.json({ userCount: userCount });
   } catch (error) {
+    return res.status(500).json(err);
+  }
+});
+
+router.delete("/:id", [auth, admin], async (req, res) => {
+  try {
+    const user = await User.findByIdAndRemove(req.params.id);
+
+    if (!user) return res.status(404).json({ message: "No User deleted" });
+
+    return res.status(200).json(user);
+  } catch (err) {
     return res.status(500).json(err);
   }
 });
