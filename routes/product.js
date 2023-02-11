@@ -129,7 +129,7 @@ router.put(
       if (!product) return res.status(400).json({ message: "Invalid product" });
 
       // Check if empty(no update) or not(update)
-      const filename = product.image;
+      let filename = product.image;
       if (req.file) {
         filename = `${req.protocol}://${req.get("host")}/public/uploads/${
           req.file.filename
