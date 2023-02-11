@@ -10,7 +10,7 @@ router.get("/", [auth], async (req, res) => {
     // .sort("dateOrdered") = sort old to new by default,
     // .sort({"dateOrdered": -1}); = sort new to old
     const orders = await Order.find()
-      .populate("user", ["name", "email"])
+      .populate("user", ["name", "email", "phone"])
       .sort({ dateOrdered: -1 });
 
     if (!orders) return res.status(404).json({ message: "No orders found" });
@@ -85,8 +85,6 @@ router.post("/", [auth], async (req, res) => {
     let order = new Order({
       orderItems: orderItemsResolved,
       shippingAddress: req.body.shippingAddress,
-      city: req.body.city,
-      zip: req.body.zip,
       country: req.body.country,
       phone: req.body.phone,
       shippingStatus: req.body.status,
