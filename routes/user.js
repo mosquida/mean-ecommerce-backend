@@ -54,27 +54,31 @@ router.post("/", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  // Check if user user exist
-  const user = await User.findOne({
-    email: req.body.email,
-  });
+  try {
+    // Check if user user exist
+    const user = await User.findOne({
+      email: req.body.email,
+    });
 
-  if (!user) return res.status(404).json({ message: "No user found" });
+    if (!user) return res.status(404).json({ message: "No user found" });
 
-  // Verify Password
-  if (user && (await user.comparePassword(req.body.password))) {
-    //Create JWT Token
-    const token = jwt.sign(
-      {
-        userId: user._id,
-        isAdmin: user.isAdmin,
-      },
-      process.env.JWT_SECRET_KEY
-    );
+    // Verify Password
+    if (user && (await user.comparePassword(req.body.password))) {
+      //Create JWT Token
+      const token = jwt.sign(
+        {
+          userId: user._id,
+          isAdmin: user.isAdmin,
+        },
+        process.env.JWT_SECRET_KEY
+      );
 
-    return res.json({ email: user.email, token: token });
-  } else {
-    return res.json({ message: "Invalid Password " });
+      return res.json({ email: user.email, token: token });
+    } else {
+      return res.status(404).json({ message: "Invalid Password " });
+    }
+  } catch (err) {
+    return res.status(500).json(err);
   }
 });
 
