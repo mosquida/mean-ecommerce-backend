@@ -31,11 +31,11 @@ mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
     console.log("Database Connected ...");
+
+    app.listen(process.env.PORT, () => {
+      console.log(`API running on port ${process.env.PORT}`);
+    });
   })
   .catch((err) => {
     console.log(err);
   });
-
-app.listen(process.env.PORT, () => {
-  console.log(`API running on port ${process.env.PORT}`);
-});
